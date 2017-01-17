@@ -1,0 +1,37 @@
+version: '2'
+services:
+  web:
+    container_name: vertx
+    image: nicolas/vertx
+    ports:
+      - 8080
+    networks:
+      - front-tier
+      - back-tier
+
+  redis:
+    container_name: redis
+    image: redis
+    links:
+      - web
+    networks:
+      - back-tier
+
+  lb:
+    container_name: loadbalancer
+    image: dockercloud/haproxy
+    ports:
+      - 80:80
+    links:
+      - web
+    networks:
+      - front-tier
+      - back-tier
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+  front-tier:
+    driver: bridge
+  back-tier:
+    driver: bridge
